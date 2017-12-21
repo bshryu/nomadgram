@@ -35,6 +35,8 @@ class LikeImage(APIView):
 
         user = request.user
 
+        # create notification for like
+
         try:
             found_image = models.Image.objects.get(id=image_id)
         except models.Image.DoesNotExist:
@@ -91,6 +93,8 @@ class CommentOnImage(APIView):
 
         user = request.user
 
+        # Comment notification
+
         try:
             found_image = models.Image.objects.get(id=image_id)
         except models.Image.DoesNotExist:
@@ -121,3 +125,24 @@ class Comment(APIView):
             return Response(status=status.HTTP_204_NO_CONTENT)
         except models.Comment.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+class Search(APIView):
+
+    def get(self, request, format=None):
+
+        hashtags = request.query_params.get('hashtags', None)
+
+        if hashtags is not None:
+
+            hashtags = hashtags.split(",")
+
+            images = models.Image.objects.filter(tags__name__in=hashtags).distict()
+
+            serializer = serializers.CountImageSerializer(images, many=True)
+
+            return Response(data=serializer.data, status=status.HTTP_200_OK)
+
+        else:
+
+            return Response(status=status.HTTP_400_BAD_REQUEST)

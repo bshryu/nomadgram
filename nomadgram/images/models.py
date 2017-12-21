@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
+from taggit.managers import TaggableManager
 from nomadgram.users import models as user_models
 
 # Create your models here.
@@ -16,11 +17,11 @@ class TimeStampedModel(models.Model):
 class Image(TimeStampedModel):
 
     """ Image Model """
-
     file = models.ImageField()
     location = models.CharField(max_length=140)
     caption = models.TextField()
     creator = models.ForeignKey(user_models.User, null=True)
+    tags = TaggableManager()
 
     @property
     def like_count(self):
